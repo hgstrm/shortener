@@ -1,0 +1,30 @@
+name: Add New Short Link
+
+on:
+  workflow_dispatch:
+    inputs:
+      short_code:
+        description: 'Short code (e.g., abc)'
+        required: true
+        type: string
+      destination_url:
+        description: 'Destination URL (e.g., https://example.com)'
+        required: true
+        type: string
+
+jobs:
+  update-links:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Add new link to YAML
+        run: |
+          python3 add_link.py "${{ github.event.inputs.short_code }}" "${{ github.event.inputs.destination_url }}"
+      - name: Commit and push changes
+        uses: test-room-7/action-update-file@v1
+        with:
+          file-path: .github/urls.yml
+          commit-msg: "Add short link: ${{ github.event.inputs.short_code }}"
+          github-token: ${{ secrets.GITHUB_TOKEN }}
